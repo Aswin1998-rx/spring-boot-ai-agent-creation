@@ -1,0 +1,107 @@
+openapi: 3.0.3
+info:
+  title: Demo Chat API
+  description: A simple chat API for AI-powered conversations
+  version: 1.0.0
+  contact:
+    name: Demo Team
+    email: support@demo.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://api.demo.com
+    description: Production server
+
+paths:
+  /chat:
+    post:
+      tags:
+        - Chat
+      summary: Send a chat message
+      description: Sends a message to the AI service and returns a response
+      operationId: chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+            example:
+              message: "Hello, how are you?"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "I'm doing well, thank you for asking!"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: The message to send to the AI service
+          example: "What is the weather like today?"
+          minLength: 1
+          maxLength: 1000
+      example:
+        message: "Hello, can you help me?"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type
+          example: "ValidationError"
+        message:
+          type: string
+          description: Detailed error message
+          example: "Message field is required"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the error occurred
+          example: "2024-01-01T12:00:00Z"
+      example:
+        error: "ValidationError"
+        message: "Message field is required"
+        timestamp: "2024-01-01T12:00:00Z"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Chat
+    description: Chat operations for AI interactions
